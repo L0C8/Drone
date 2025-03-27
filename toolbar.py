@@ -6,9 +6,9 @@ class Toolbar:
     def __init__(self, font, screen_width, theme):
         self.font = font
         self.height = 32
-        self.bg_color = theme.BG_COLOR
-        self.bg_color_selected = theme.BG_COLOR_SELECTED
-        self.bg_spacer = theme.BG_SPACER
+        self.bg_color = theme.WIDGET_BG
+        self.bg_color_selected = theme.WIDGET_BG_SELECTED
+        self.bg_spacer = theme.WIDGET_SPACER
         self.text_color = theme.TEXT_COLOR
         self.items = ['File', 'Help']
         self.item_rects = []

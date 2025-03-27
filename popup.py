@@ -4,7 +4,7 @@ class Popup:
     def __init__(self, font, message, theme):
         self.font = font
         self.message = message
-        self.bg_color = theme.BG_COLOR
+        self.bg_color = theme.WIDGET_BG
         self.text_color = theme.TEXT_COLOR
         self.rect = pygame.Rect(0, 0, 300, 100)
         self.rect.center = (320, 240)

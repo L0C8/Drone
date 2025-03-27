@@ -1,5 +1,6 @@
 import pygame
 import sys
+from popup import Popup
 
 class Toolbar:
     def __init__(self, font, screen_width, theme):
@@ -17,6 +18,7 @@ class Toolbar:
         self.about_rect = None
         self.new_game_rect = None
         self.build_toolbar()
+        self.popup = Popup(font, "Are you sure you want to exit?", theme)
 
     def build_toolbar(self):
         x_offset = 10
@@ -40,6 +42,8 @@ class Toolbar:
             self.draw_file_dropdown(screen)
         elif self.dropdown_active == 'Help':
             self.draw_help_dropdown(screen)
+        
+        self.popup.draw(screen)
 
     def draw_file_dropdown(self, screen):
         x = self.item_rects[0][1].left
@@ -71,6 +75,13 @@ class Toolbar:
         self.about_rect = about_rect
 
     def handle_event(self, event):
+        if self.popup.visible:
+            result = self.popup.handle_event(event)
+            if result == "ok":
+                pygame.quit()
+                sys.exit()
+            return
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = event.pos
             clicked_on_tab = False
@@ -87,8 +98,7 @@ class Toolbar:
                 if self.new_game_rect and self.new_game_rect.collidepoint(mouse_pos):
                     print("New Game clicked")
                 elif self.exit_rect and self.exit_rect.collidepoint(mouse_pos):
-                    pygame.quit()
-                    sys.exit()
+                    self.popup.show()
 
             if self.dropdown_active == 'Help' and self.about_rect and self.about_rect.collidepoint(mouse_pos):
                 print("About clicked")

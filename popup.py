@@ -230,13 +230,14 @@ class PopupSettings:
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             if self.close_button_rect.collidepoint(pos) or self.cancel_rect.collidepoint(pos):
-                print("Settings canceled")
+                print("Settings cancelled")
                 self.hide()
                 return None
             elif self.accept_rect.collidepoint(pos):
                 print("Settings accepted")
+                self.result = f"theme:{self.selected_theme}"
                 self.hide()
-                return None
+                return self.result
 
             for tab, rect in self.tab_rects:
                 if rect.collidepoint(pos):

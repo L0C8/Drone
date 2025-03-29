@@ -50,7 +50,14 @@ class MainApp:
         self.running = False
 
     def handle_popup_result(self, popup, result):
-        title = popup.title.lower()
+        if result == "cancel":
+            print("Popup closed or canceled.")
+            return
+        title = getattr(popup, 'title', '').lower()
+        if isinstance(result, str) and result.startswith("theme:"):
+            _, theme_name = result.split(":", 1)
+            self.set_theme(theme_name)
+            return
         if title == "confirm exit" and result == "yes":
             self._quit()
         elif title == "new game" and result == "yes":

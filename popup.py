@@ -154,12 +154,18 @@ class PopupSettings:
 
         self.dropdown_active = False
         self.theme_names = list(theme_definitions.keys())
-        self.selected_theme = 'dark'
+        self.selected_theme = self.get_theme_name(theme)
         self.dropdown_rect = pygame.Rect(self.rect.left + 20, self.rect.top + 90, 140, 24)
         self.dropdown_items = [pygame.Rect(self.dropdown_rect.x, self.dropdown_rect.y + (i + 1) * 25, 140, 24)
                                 for i in range(len(self.theme_names))]
 
         self._build_tabs()
+
+    def get_theme_name(self, current_theme):
+        for name, cls in theme_definitions.items():
+            if isinstance(current_theme, cls):
+                return name
+        return 
 
     def _build_tabs(self):
         self.tab_rects = []
@@ -169,6 +175,7 @@ class PopupSettings:
             rect = pygame.Rect(x, self.rect.top + 10, text_surf.get_width() + 20, self.tab_height)
             self.tab_rects.append((tab, rect))
             x += rect.width + 10
+
 
     def show(self):
         self.visible = True
@@ -231,8 +238,9 @@ class PopupSettings:
             pos = event.pos
             if self.close_button_rect.collidepoint(pos) or self.cancel_rect.collidepoint(pos):
                 print("Settings cancelled")
+                self.result = "cancel"
                 self.hide()
-                return None
+                return self.result
             elif self.accept_rect.collidepoint(pos):
                 print("Settings accepted")
                 self.result = f"theme:{self.selected_theme}"

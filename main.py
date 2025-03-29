@@ -2,7 +2,7 @@ import pygame
 import sys
 import os
 from toolbar import Toolbar
-from popup import Popup
+from popup import Popup, PopupSettings
 from assets.ui_themes import get_theme
 
 WINDOW_WIDTH = 640
@@ -68,6 +68,8 @@ class MainApp:
             popup = Popup(self.font, "New Game", "Start a new game?", self.theme, kind="yesno")
         elif signal == "test_string":
             popup = Popup(self.font, "Enter String", "Give me a string?", self.theme, kind="input")
+        elif signal == "settings":
+            popup = PopupSettings(self.font, self.theme)
         elif signal.startswith("theme:"):
             new_theme = signal.split(":")[1]
             print("Switching theme to:", new_theme)

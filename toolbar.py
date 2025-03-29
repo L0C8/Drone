@@ -13,7 +13,7 @@ class Toolbar:
         self.signal = None
 
         self.dropdowns = {
-            0: [("New Game", "new_game"), ("Test", "test_string"), ("Exit", "exit")],
+            0: [("New Game", "new_game"), ("Settings", "settings"), ("Exit", "exit")],
             1: [("About", "about")]
         }
 

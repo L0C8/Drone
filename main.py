@@ -3,6 +3,7 @@ import sys
 import os
 from toolbar import Toolbar
 from popup import Popup, PopupSettings
+from game import Game
 from assets.ui_themes import get_theme
 
 WINDOW_WIDTH = 640
@@ -24,6 +25,7 @@ class MainApp:
         self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
         self.toolbar = Toolbar(self.font, WINDOW_WIDTH, self.theme)
+        self.game = Game(WINDOW_WIDTH, WINDOW_HEIGHT, self.theme)
         self.popups = []
 
     def load_data(self):
@@ -44,6 +46,8 @@ class MainApp:
         self.theme_name = theme_name
         self.theme = get_theme(theme_name)
         self.toolbar.set_theme(self.theme)
+        self.game.theme = self.theme
+        self.game.update_theme()
         self.save_data()
 
     def _quit(self):
@@ -111,6 +115,7 @@ class MainApp:
                 self.handle_event(event)
 
             self.screen.fill(self.theme.GAME_BG)
+            self.game.draw(self.screen)
             self.toolbar.draw(self.screen)
             for popup in self.popups:
                 popup.draw(self.screen)

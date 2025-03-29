@@ -43,6 +43,8 @@ class MainApp:
                 print("New Game triggered (not yet implemented)")
             elif signal == "about":
                 print("About clicked (popup not implemented)")
+            else:
+                print("undefined action")
 
             self.toolbar.signal = None
 

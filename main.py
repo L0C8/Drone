@@ -10,8 +10,14 @@ FONT_PATH = "assets/ndsbios_memesbruh03.ttf"
 FONT_SIZE = 16
 
 def main():
+
+    def exit_program():
+        game.stop() 
+        pygame.quit()
+        sys.exit()
+
     pygame.init()
-    theme = get_theme("sunset") 
+    theme = get_theme("neon") 
     game = Game(WINDOW_WIDTH, WINDOW_HEIGHT, theme)
     game.update_theme()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -19,7 +25,7 @@ def main():
     clock = pygame.time.Clock()
     font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
-    toolbar = Toolbar(font, WINDOW_WIDTH, theme)
+    toolbar = Toolbar(font, WINDOW_WIDTH, theme, exit_callback=exit_program)
 
     running = True
     while running:
@@ -35,8 +41,7 @@ def main():
         pygame.display.flip()
         clock.tick(60)
 
-    pygame.quit()
-    sys.exit()
+    exit_program()
 
 if __name__ == "__main__":
     main()

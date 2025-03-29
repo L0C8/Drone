@@ -3,7 +3,7 @@ import sys
 from popup import Popup
 
 class Toolbar:
-    def __init__(self, font, screen_width, theme):
+    def __init__(self, font, screen_width, theme, exit_callback=None):
         self.font = font
         self.height = 32
         self.bg_color = theme.WIDGET_BG
@@ -17,6 +17,7 @@ class Toolbar:
         self.exit_rect = None
         self.about_rect = None
         self.new_game_rect = None
+        self.exit_callback = exit_callback
         self.build_toolbar()
         self.popup = Popup(font, "Are you sure you want to exit?", theme)
 
@@ -78,8 +79,11 @@ class Toolbar:
         if self.popup.visible:
             result = self.popup.handle_event(event)
             if result == "ok":
-                pygame.quit()
-                sys.exit()
+                if self.exit_callback:
+                    self.exit_callback()
+                else:
+                    pygame.quit()
+                    sys.exit()
             return
 
         if event.type == pygame.MOUSEBUTTONDOWN:

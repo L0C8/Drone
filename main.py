@@ -1,6 +1,9 @@
 import pygame
 import sys
+import os
 from toolbar import Toolbar
+from popup import Popup
+from assets.ui_themes import get_theme
 
 WINDOW_WIDTH = 640
 WINDOW_HEIGHT = 480
@@ -16,58 +19,98 @@ class MainApp:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        # Load font
+        self.theme_name = self.load_data()
+        self.theme = get_theme(self.theme_name)
         self.font = pygame.font.Font(FONT_PATH, FONT_SIZE)
 
-        # Core components
-        self.toolbar = Toolbar(self.font, WINDOW_WIDTH)
-        self.game = None  # To be added later
+        self.toolbar = Toolbar(self.font, WINDOW_WIDTH, self.theme)
+        self.popups = []
 
-    def handle_global_event(self, event):
-        if event.type == pygame.QUIT:
-            self.running = False
+    def load_data(self):
+        save_path = ".runtimedata"
+        if not os.path.exists(save_path):
+            with open(save_path, "w") as f:
+                f.write("dark")
+            return "dark"
+        with open(save_path, "r") as f:
+            theme_name = f.read().strip()
+            return theme_name if theme_name else "dark"
 
-        # Pass event to components
-        if self.toolbar:
-            self.toolbar.handle_event(event)
-        if self.game:
-            self.game.handle_event(event)
+    def save_data(self):
+        with open(".runtimedata", "w") as f:
+            f.write(self.theme_name)
 
-    def process_signals(self):
-        if self.toolbar and self.toolbar.signal:
-            signal = self.toolbar.signal
+    def set_theme(self, theme_name):
+        self.theme_name = theme_name
+        self.theme = get_theme(theme_name)
+        self.toolbar.set_theme(self.theme)
+        self.save_data()
 
-            if signal == "exit":
-                self.running = False
-            elif signal == "new_game":
-                print("New Game triggered (not yet implemented)")
-            elif signal == "about":
-                print("About clicked (popup not implemented)")
-            else:
-                print("undefined action")
+    def _quit(self):
+        self.running = False
 
+    def handle_popup_result(self, popup, result):
+        title = popup.title.lower()
+        if title == "confirm exit" and result == "yes":
+            self._quit()
+        elif title == "new game" and result == "yes":
+            print("Starting new game!")
+        elif title == "enter string" and result != "cancel":
+            print(f"User input: {result}")
+        else:
+            print(f"Popup result for '{title}': {result}")
+
+    def create_popup_from_signal(self, signal):
+        popup = None
+        if signal == "exit":
+            popup = Popup(self.font, "Confirm Exit", "Are you sure you want to quit?", self.theme, kind="yesno")
+        elif signal == "new_game":
+            popup = Popup(self.font, "New Game", "Start a new game?", self.theme, kind="yesno")
+        elif signal == "test_string":
+            popup = Popup(self.font, "Enter String", "Give me a string?", self.theme, kind="input")
+        elif signal.startswith("theme:"):
+            new_theme = signal.split(":")[1]
+            print("Switching theme to:", new_theme)
+            self.set_theme(new_theme)
+            return
+        else:
+            print(f"Unhandled signal: {signal}")
+
+        if popup:
+            popup.show()
+            self.popups.append(popup)
+
+    def handle_event(self, event):
+        if self.popups:
+            popup = self.popups[-1]
+            result = popup.handle_event(event)
+            if result:
+                self.handle_popup_result(popup, result)
+                self.popups.pop()
+            return
+
+        self.toolbar.handle_event(event)
+        if self.toolbar.signal:
+            self.create_popup_from_signal(self.toolbar.signal)
             self.toolbar.signal = None
 
     def run(self):
         while self.running:
             for event in pygame.event.get():
-                self.handle_global_event(event)
+                if event.type == pygame.QUIT:
+                    self._quit()
+                self.handle_event(event)
 
-            self.process_signals()
-
-            self.screen.fill((30, 30, 30))  # fallback background
-
-            if self.game:
-                self.game.draw(self.screen)
-            if self.toolbar:
-                self.toolbar.draw(self.screen)
+            self.screen.fill(self.theme.GAME_BG)
+            self.toolbar.draw(self.screen)
+            for popup in self.popups:
+                popup.draw(self.screen)
 
             pygame.display.flip()
             self.clock.tick(FPS)
 
         pygame.quit()
         sys.exit()
-
 
 if __name__ == "__main__":
     app = MainApp()
